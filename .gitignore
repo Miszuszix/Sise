@@ -29,5 +29,7 @@ bin/
 ### VS Code ###
 .vscode/
 
+*sol.txt
+
 ### Mac OS ###
 .DS_Store
