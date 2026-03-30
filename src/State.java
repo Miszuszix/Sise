@@ -6,13 +6,26 @@ public class State {
     int xPosition;
     int yPosition;
 
+    public State(int[][] puzzleState) {
+        this.puzzleState = puzzleState;
+        for(int i = 0; i < puzzleState.length; i++){
+            for(int j = 0; j < puzzleState.length; j++){
+                if(puzzleState[i][j] == 0){
+                    this.xPosition = j;
+                    this.yPosition = i;
+                    return;
+                }
+            }
+        }
+    }
+    
     public State(int[][] puzzleState, int xPosition, int yPosition) {
         this.puzzleState = puzzleState;
         this.xPosition = xPosition;
         this.yPosition = yPosition;
     }
 
-    public State createNextState(char move){
+    public State createNextState(char move) {
         int[][] nextState = new int[puzzleState.length][puzzleState.length];
         for (int i = 0; i < puzzleState.length; i++) {
             nextState[i] = puzzleState[i].clone();
@@ -37,21 +50,33 @@ public class State {
         }
         return null;
     }
-    
-    public ArrayList<Character> generatePossibleMoves() {
+
+    public ArrayList<Character> generatePossibleMoves(String moveOrder) {
         int bounds = puzzleState.length;
         ArrayList<Character> moves = new ArrayList<>();
-        if (xPosition < bounds - 1) {
-            moves.add('R');
-        }
-        if (xPosition > 0) {
-            moves.add('L');
-        }
-        if (yPosition > 0) {
-            moves.add('U');
-        }
-        if (yPosition < bounds - 1) {
-            moves.add('D');
+        for (char move : moveOrder.toCharArray()) {
+            switch (move) {
+                case 'R':
+                    if (xPosition < bounds - 1) {
+                        moves.add('R');
+                    }
+                    break;
+                case 'L':
+                    if (xPosition > 0) {
+                        moves.add('L');
+                    }
+                    break;
+                case 'U':
+                    if (yPosition > 0) {
+                        moves.add('U');
+                    }
+                    break;
+                case 'D':
+                    if (yPosition < bounds - 1) {
+                        moves.add('D');
+                    }
+                    break;
+            }
         }
         return moves;
     }
@@ -67,11 +92,11 @@ public class State {
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;
-        
+
         if (object == null || getClass() != object.getClass()) return false;
-        
+
         State state = (State) object;
-        
+
         return xPosition == state.xPosition &&
                 yPosition == state.yPosition &&
                 Arrays.deepEquals(puzzleState, state.puzzleState);

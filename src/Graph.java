@@ -3,11 +3,13 @@ import java.util.Collections;
 
 public class Graph {
     private final State goalState;
-    
-    public Graph(State goalState) {
+    private String moveOrder;
+
+    public Graph(State goalState, String moveOrder) {
         this.goalState = goalState;
+        this.moveOrder = moveOrder;
     }
-    
+
     public boolean isGoalState(State state) {
         return goalState.equals(state);
     }
@@ -15,7 +17,7 @@ public class Graph {
     public ArrayList<Node> generateNeighbours(Node currentNode) {
         ArrayList<Node> neighbours = new ArrayList<>();
         State currentState = currentNode.getPuzzleState();
-        ArrayList<Character> possibleMoves = currentState.generatePossibleMoves();
+        ArrayList<Character> possibleMoves = currentState.generatePossibleMoves(moveOrder);
         
         char parentOperator = currentNode.getOperator();
         
@@ -48,9 +50,11 @@ public class Graph {
     }
 
     ArrayList<Character> returnSolutionPath(Node goalNode){
+        int solutionLength = 0;
         ArrayList<Character> solutionPath = new ArrayList<>();
         while(goalNode.getParentNode() != null){
             solutionPath.add(goalNode.getOperator());
+            solutionLength++;
             goalNode = goalNode.getParentNode();
         }
         Collections.reverse(solutionPath);
