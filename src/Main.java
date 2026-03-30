@@ -4,25 +4,24 @@ void main(String... args) {
         System.err.println("Please provide a move order.");
         System.exit(1);
     }
-    String moveOrder = args[0].toUpperCase();
+    
+    String strategy = args[0];
+    String moveOrder = args[1].toUpperCase();
+    String inputFileName = args[2];
 
     final State goalState = new State(new int[][]{
             {1, 2, 3, 4},
             {5, 6, 7, 8},
             {9, 10, 11, 12},
-            {13, 14, 15, 0}},
-            3, 3);
+            {13, 14, 15, 0}}
+    );
 
-    int[][] initialPuzzleState = readPuzzleStateFromFile(args[1]);
-    for (int[] ints : initialPuzzleState) {
-        for (int j = 0; j < initialPuzzleState.length; j++) {
-            IO.print(ints[j] + " ");
-        }
-        IO.println();
-    }
+    int[][] initialPuzzleState = readPuzzleStateFromFile(inputFileName);
     State initialState = new State(initialPuzzleState);
+    
     Graph testGraph = new Graph(goalState, moveOrder);
-    System.out.println(BFS(testGraph, new Node(initialState)));
+    
+    writeSolutionPathToFile(BFS(testGraph, new Node(initialState)), strategy, moveOrder, inputFileName);
 }
 
 ArrayList<Character> BFS(Graph graph, Node beginningNode) {
@@ -52,9 +51,9 @@ ArrayList<Character> BFS(Graph graph, Node beginningNode) {
     return null;
 }
 
-public int[][] readPuzzleStateFromFile(String filename) {
+public int[][] readPuzzleStateFromFile(String inputFileName) {
     try {
-        File puzzleFile = new File(filename);
+        File puzzleFile = new File(inputFileName);
         Scanner scanner = new Scanner(puzzleFile);
         
         if(scanner.hasNextInt()) {
@@ -74,4 +73,24 @@ public int[][] readPuzzleStateFromFile(String filename) {
         System.exit(1);
     }
     return null;
+}
+
+public void writeSolutionPathToFile(ArrayList<Character> solutionPath, String... args) {
+    try {
+        String fileName = args[2];
+        String baseName = fileName.substring(0, fileName.lastIndexOf('.'));
+        
+        String outputFileName = String.format("%s_%s_%s_sol.txt", baseName, args[0], args[1].toLowerCase());
+        
+        File solutionFile = new File(outputFileName);
+        PrintWriter writer = new PrintWriter(solutionFile);
+        writer.println(solutionPath.size());
+        for (Character move : solutionPath) {
+            writer.print(move);
+        }
+        writer.close();
+    } catch (FileNotFoundException e) {
+        System.err.println("File not found.");
+        System.exit(1);
+    }
 }

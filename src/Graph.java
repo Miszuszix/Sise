@@ -50,11 +50,9 @@ public class Graph {
     }
 
     ArrayList<Character> returnSolutionPath(Node goalNode){
-        int solutionLength = 0;
         ArrayList<Character> solutionPath = new ArrayList<>();
         while(goalNode.getParentNode() != null){
             solutionPath.add(goalNode.getOperator());
-            solutionLength++;
             goalNode = goalNode.getParentNode();
         }
         Collections.reverse(solutionPath);
