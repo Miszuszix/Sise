@@ -29,7 +29,7 @@ bin/
 ### VS Code ###
 .vscode/
 
-*sol.txt
+*.txt
 
 ### Mac OS ###
 .DS_Store

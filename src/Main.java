@@ -1,3 +1,6 @@
+int generatedStates = 0;
+int expandedStates = 0;
+
 void main(String... args) {
 
     if (args.length < 1) {
@@ -8,6 +11,8 @@ void main(String... args) {
     String strategy = args[0];
     String moveOrder = args[1].toUpperCase();
     String inputFileName = args[2];
+    String outputFileName = args[3];
+    String statsFileName = args[4];
 
     final State goalState = new State(new int[][]{
             {1, 2, 3, 4},
@@ -19,9 +24,11 @@ void main(String... args) {
     int[][] initialPuzzleState = readPuzzleStateFromFile(inputFileName);
     State initialState = new State(initialPuzzleState);
     
-    Graph testGraph = new Graph(goalState, moveOrder);
+    Graph graph = new Graph(goalState, moveOrder);
     
-    writeSolutionPathToFile(BFS(testGraph, new Node(initialState)), strategy, moveOrder, inputFileName);
+    ArrayList<Character> solution = BFS(graph, new Node(initialState));
+    
+    writeResultsToFiles(generatedStates, expandedStates, solution, strategy, outputFileName, statsFileName);
 }
 
 ArrayList<Character> BFS(Graph graph, Node beginningNode) {
@@ -35,6 +42,7 @@ ArrayList<Character> BFS(Graph graph, Node beginningNode) {
     openStates.add(beginningNode);
     while (!openStates.isEmpty()) {
         currentNode = openStates.remove();
+        expandedStates++;
         
         for (Node neighbour : graph.generateNeighbours(currentNode)) {
             State neighbourPuzzleState = neighbour.getPuzzleState();
@@ -44,6 +52,7 @@ ArrayList<Character> BFS(Graph graph, Node beginningNode) {
             }
             if (!closedStates.contains(neighbourPuzzleState)) {
                 openStates.add(neighbour);
+                generatedStates++;
                 closedStates.add(neighbourPuzzleState);
             }
         }
@@ -75,20 +84,45 @@ public int[][] readPuzzleStateFromFile(String inputFileName) {
     return null;
 }
 
-public void writeSolutionPathToFile(ArrayList<Character> solutionPath, String... args) {
+public void writeResultsToFiles(int generatedStates, int expandedStates, ArrayList<Character> solutionPath, String... args) {
+    String strategy = args[0];
+    String outputFileName = args[1];
+    String statsFileName = args[2];
+    int solutionLength;
     try {
-        String fileName = args[2];
-        String baseName = fileName.substring(0, fileName.lastIndexOf('.'));
-        
-        String outputFileName = String.format("%s_%s_%s_sol.txt", baseName, args[0], args[1].toLowerCase());
-        
         File solutionFile = new File(outputFileName);
-        PrintWriter writer = new PrintWriter(solutionFile);
-        writer.println(solutionPath.size());
-        for (Character move : solutionPath) {
-            writer.print(move);
+        File statsFile = new File(statsFileName);
+        
+        PrintWriter solutionWriter = new PrintWriter(solutionFile);
+        PrintWriter statsWriter = new PrintWriter(statsFile);
+        
+        if (solutionPath == null) {
+            solutionLength = -1;
+            solutionWriter.println(solutionLength);
+            statsWriter.println(solutionLength);
+        }else {
+            solutionLength = solutionPath.size();
+            solutionWriter.println(solutionLength);
+            statsWriter.println(solutionLength);
+            for (Character move : solutionPath) {
+                solutionWriter.print(move);
+            }
         }
-        writer.close();
+        solutionWriter.close();
+        statsWriter.println(generatedStates);
+        statsWriter.println(expandedStates);
+        switch(strategy){
+            case "bfs":
+                statsWriter.print(solutionLength);
+                break;
+            case "dfs":
+                //TODO: add max recursive depth for DFS
+                break;
+            case "astr":
+                //TODO: add max recursive depth for ASTR
+                break;
+        }
+        statsWriter.close();
     } catch (FileNotFoundException e) {
         System.err.println("File not found.");
         System.exit(1);
