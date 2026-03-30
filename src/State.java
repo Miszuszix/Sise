@@ -9,7 +9,7 @@ public class State {
     public State(int[][] puzzleState) {
         this.puzzleState = puzzleState;
         for(int i = 0; i < puzzleState.length; i++){
-            for(int j = 0; j < puzzleState.length; j++){
+            for(int j = 0; j < puzzleState[0].length; j++){
                 if(puzzleState[i][j] == 0){
                     this.xPosition = j;
                     this.yPosition = i;
@@ -26,7 +26,7 @@ public class State {
     }
 
     public State createNextState(char move) {
-        int[][] nextState = new int[puzzleState.length][puzzleState.length];
+        int[][] nextState = new int[puzzleState.length][puzzleState[0].length];
         for (int i = 0; i < puzzleState.length; i++) {
             nextState[i] = puzzleState[i].clone();
         }
@@ -52,12 +52,13 @@ public class State {
     }
 
     public ArrayList<Character> generatePossibleMoves(String moveOrder) {
-        int bounds = puzzleState.length;
+        int xBounds = puzzleState[0].length;
+        int yBounds = puzzleState.length;
         ArrayList<Character> moves = new ArrayList<>();
         for (char move : moveOrder.toCharArray()) {
             switch (move) {
                 case 'R':
-                    if (xPosition < bounds - 1) {
+                    if (xPosition < xBounds - 1) {
                         moves.add('R');
                     }
                     break;
@@ -72,7 +73,7 @@ public class State {
                     }
                     break;
                 case 'D':
-                    if (yPosition < bounds - 1) {
+                    if (yPosition < yBounds - 1) {
                         moves.add('D');
                     }
                     break;

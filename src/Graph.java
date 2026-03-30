@@ -3,7 +3,7 @@ import java.util.Collections;
 
 public class Graph {
     private final State goalState;
-    private String moveOrder;
+    private final String moveOrder;
 
     public Graph(State goalState, String moveOrder) {
         this.goalState = goalState;

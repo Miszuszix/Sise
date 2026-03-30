@@ -66,8 +66,8 @@ public int[][] readPuzzleStateFromFile(String inputFileName) {
         Scanner scanner = new Scanner(puzzleFile);
         
         if(scanner.hasNextInt()) {
-            int rows = scanner.nextInt();
             int columns = scanner.nextInt();
+            int rows = scanner.nextInt();
             int[][] initialPuzzleState = new int[rows][columns];
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < columns; j++) {
