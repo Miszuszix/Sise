@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Graph {
     private final State goalState;
@@ -44,5 +45,15 @@ public class Graph {
             neighbours.add(new Node(nextState, currentNode, move));
         }
         return neighbours;
+    }
+
+    ArrayList<Character> returnSolutionPath(Node goalNode){
+        ArrayList<Character> solutionPath = new ArrayList<>();
+        while(goalNode.getParentNode() != null){
+            solutionPath.add(goalNode.getOperator());
+            goalNode = goalNode.getParentNode();
+        }
+        Collections.reverse(solutionPath);
+        return solutionPath;
     }
 }

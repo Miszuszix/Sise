@@ -18,7 +18,7 @@ void main() {
 ArrayList<Character> BFS(Graph graph, Node beginningNode) {
     Node currentNode;
     if (graph.isGoalState(beginningNode.getPuzzleState())) {
-        return returnSolutionPath(beginningNode);
+        return graph.returnSolutionPath(beginningNode);
     }
     Deque<Node> openStates = new LinkedList<>();
     HashSet<State> closedStates = new HashSet<>();
@@ -32,7 +32,7 @@ ArrayList<Character> BFS(Graph graph, Node beginningNode) {
             State neighbourPuzzleState = neighbour.getPuzzleState();
             
             if (graph.isGoalState(neighbourPuzzleState)) {
-                return returnSolutionPath(neighbour);
+                return graph.returnSolutionPath(neighbour);
             }
             if (!closedStates.contains(neighbourPuzzleState)) {
                 openStates.add(neighbour);
@@ -41,14 +41,4 @@ ArrayList<Character> BFS(Graph graph, Node beginningNode) {
         }
     }
     return null;
-}
-
-ArrayList<Character> returnSolutionPath(Node goalNode){
-    ArrayList<Character> solutionPath = new ArrayList<>();
-    while(goalNode.getParentNode() != null){
-        solutionPath.add(goalNode.getOperator());
-        goalNode = goalNode.getParentNode();
-    }
-    Collections.reverse(solutionPath);
-    return solutionPath;
 }
