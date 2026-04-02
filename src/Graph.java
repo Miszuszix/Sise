@@ -44,7 +44,7 @@ public class Graph {
                     }
             }
             State nextState = currentState.createNextState(move);
-            neighbours.add(new Node(nextState, currentNode, move));
+            neighbours.add(new Node(nextState, currentNode, move, currentNode.getDepth() + 1));
         }
         return neighbours;
     }
