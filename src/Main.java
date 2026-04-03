@@ -15,36 +15,38 @@ void main(String... args) {
     String outputFileName = args[3];
     String statsFileName = args[4];
 
-    final State goalState = new State(new int[][]{
-            {1, 2, 3, 4},
-            {5, 6, 7, 8},
-            {9, 10, 11, 12},
-            {13, 14, 15, 0}}
-    );
-
     int[][] initialPuzzleState = readPuzzleStateFromFile(inputFileName);
+    //dynamic generating goalState
+    int goalRows = initialPuzzleState.length;
+    int goalColumns = initialPuzzleState[0].length;
+    int[][] goalBoard = new int[goalRows][goalColumns];
+    
+    for(int i = 0; i < goalBoard.length; i++) {
+        for(int j = 0; j < goalBoard[0].length; j++) {
+            //fill board with values from 1 to n...
+            goalBoard[i][j] = i * goalColumns + j + 1;
+        }
+    }
+    //override last cell to 0
+    goalBoard[goalRows - 1][goalColumns - 1] = 0;
+    
     State initialState = new State(initialPuzzleState);
+    State goalState = new State(goalBoard);
     
     Graph graph = new Graph(goalState, moveOrder);
     
-    ArrayList<Character> solution;
+    ArrayList<Character> solution = switch (strategy) {
+        case "bfs" -> BFS(graph, new Node(initialState));
+        case "dfs" -> DFS(graph, new Node(initialState), 20);
+        case "astr" ->
+            //TODO: add astr strategy
+                null;
+        default -> {
+            System.out.println("Unknown strategy: " + strategy);
+            yield null;
+        }
+    };
 
-    switch (strategy) {
-    case "bfs":
-        solution = BFS(graph, new Node(initialState));
-        break;
-    case "dfs":
-        solution = DFS(graph, new Node(initialState), 20);
-        break;
-    case "astr":
-        //TODO: add astr strategy
-        solution = null;
-        break;
-    default:
-        System.out.println("Unknown strategy: " + strategy);
-        solution = null;
-}
-    
     writeResultsToFiles(generatedStates, expandedStates, solution, strategy, outputFileName, statsFileName);
 }
 
@@ -62,7 +64,6 @@ ArrayList<Character> BFS(Graph graph, Node beginningNode) {
         expandedStates++;
         
         for (Node neighbour : graph.generateNeighbours(currentNode)) {
-            generatedStates++;
             State neighbourPuzzleState = neighbour.getPuzzleState();
 
             if (graph.isGoalState(neighbourPuzzleState)) {
@@ -71,6 +72,7 @@ ArrayList<Character> BFS(Graph graph, Node beginningNode) {
             if (!closedStates.contains(neighbourPuzzleState)) {
                 openStates.add(neighbour);
                 closedStates.add(neighbourPuzzleState);
+                generatedStates++;
             }
         }
     }
@@ -84,15 +86,15 @@ ArrayList<Character> DFS(Graph graph, Node beginningNode, int depthLimit) {
     }
 
     Deque<Node> openStates = new ArrayDeque<>();
-    HashSet<State> closedStates = new HashSet<>();
+    HashMap<State, Integer> closedStates = new HashMap<>();
     
     openStates.push(beginningNode);
     generatedStates++;
+    closedStates.put(beginningNode.getPuzzleState(), beginningNode.getDepth());
 
     while (!openStates.isEmpty()) {
         Node currentNode = openStates.pop();
         expandedStates++;
-        closedStates.add(currentNode.getPuzzleState());
         maxDepthReached = Math.max(maxDepthReached, currentNode.getDepth());
 
         // Sprawdzenie, czy osiągnięto limit głębokości.
@@ -104,11 +106,12 @@ ArrayList<Character> DFS(Graph graph, Node beginningNode, int depthLimit) {
             for (Node neighbour : neighbours) {
                 State neighbourPuzzleState = neighbour.getPuzzleState();
                 
-                if (!closedStates.contains(neighbourPuzzleState) && !openStates.contains(neighbour)) {
+                if (!closedStates.containsKey(neighbourPuzzleState) || neighbour.getDepth() < closedStates.get(neighbourPuzzleState)) {
                     if (graph.isGoalState(neighbourPuzzleState)) {
                         maxDepthReached = neighbour.getDepth();
                         return graph.returnSolutionPath(neighbour);
                     }
+                    closedStates.put(neighbourPuzzleState, neighbour.getDepth());
                     openStates.push(neighbour);
                     generatedStates++;
                 }
