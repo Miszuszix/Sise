@@ -36,7 +36,7 @@ void main(String... args) {
     
     ArrayList<Character> solution = switch (strategy) {
         case "bfs" -> BFS(graph, new Node(initialState));
-        case "dfs" -> DFS(graph, new Node(initialState), 20);
+        case "dfs" -> DFS(graph, new Node(initialState), 10);
         case "astr" -> {
             boolean isManhattan = param.equalsIgnoreCase("manh");
             yield ASTAR(graph, new Node(initialState, goalState, isManhattan));
@@ -106,7 +106,7 @@ ArrayList<Character> DFS(Graph graph, Node beginningNode, int depthLimit) {
                 
                 if (!closedStates.containsKey(neighbourPuzzleState) || neighbour.getDepth() < closedStates.get(neighbourPuzzleState)) {
                     if (graph.isGoalState(neighbourPuzzleState)) {
-                        maxDepthReached = neighbour.getDepth();
+                        maxDepthReached = Math.max(maxDepthReached, neighbour.getDepth());
                         return graph.returnSolutionPath(neighbour);
                     }
                     closedStates.put(neighbourPuzzleState, neighbour.getDepth());
@@ -200,10 +200,7 @@ public void writeResultsToFiles(int generatedStates, int expandedStates, ArrayLi
             case "bfs":
                 statsWriter.print(solutionLength);
                 break;
-            case "dfs":
-                statsWriter.print(maxDepthReached);
-                break;
-            case "astr":
+            case "dfs", "astr":
                 statsWriter.print(maxDepthReached);
                 break;
         }
