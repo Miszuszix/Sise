@@ -10,7 +10,8 @@ void main(String... args) {
     }
     
     String strategy = args[0].toLowerCase();
-    String moveOrder = args[1].toUpperCase();
+    String param = args[1].toUpperCase();
+    String moveOrder = strategy.equals("astr") ? "RDUL" : param;
     String inputFileName = args[2];
     String outputFileName = args[3];
     String statsFileName = args[4];
@@ -23,11 +24,9 @@ void main(String... args) {
     
     for(int i = 0; i < goalBoard.length; i++) {
         for(int j = 0; j < goalBoard[0].length; j++) {
-            //fill board with values from 1 to n...
             goalBoard[i][j] = i * goalColumns + j + 1;
         }
     }
-    //override last cell to 0
     goalBoard[goalRows - 1][goalColumns - 1] = 0;
     
     State initialState = new State(initialPuzzleState);
@@ -38,9 +37,10 @@ void main(String... args) {
     ArrayList<Character> solution = switch (strategy) {
         case "bfs" -> BFS(graph, new Node(initialState));
         case "dfs" -> DFS(graph, new Node(initialState), 20);
-        case "astr" ->
-            //TODO: add astr strategy
-                null;
+        case "astr" -> {
+            boolean isManhattan = param.equalsIgnoreCase("manh");
+            yield ASTAR(graph, new Node(initialState, goalState, isManhattan));
+        }
         default -> {
             System.out.println("Unknown strategy: " + strategy);
             yield null;
@@ -51,16 +51,16 @@ void main(String... args) {
 }
 
 ArrayList<Character> BFS(Graph graph, Node beginningNode) {
-    Node currentNode;
     if (graph.isGoalState(beginningNode.getPuzzleState())) {
         return graph.returnSolutionPath(beginningNode);
     }
+
     Deque<Node> openStates = new LinkedList<>();
     HashSet<State> closedStates = new HashSet<>();
 
     openStates.add(beginningNode);
     while (!openStates.isEmpty()) {
-        currentNode = openStates.remove();
+        Node currentNode = openStates.remove();
         expandedStates++;
         
         for (Node neighbour : graph.generateNeighbours(currentNode)) {
@@ -80,7 +80,6 @@ ArrayList<Character> BFS(Graph graph, Node beginningNode) {
 }
 
 ArrayList<Character> DFS(Graph graph, Node beginningNode, int depthLimit) {
-    // Sprawdzenie, czy stan początkowy jest stanem docelowym.
     if (graph.isGoalState(beginningNode.getPuzzleState())) {
         return graph.returnSolutionPath(beginningNode);
     }
@@ -97,7 +96,6 @@ ArrayList<Character> DFS(Graph graph, Node beginningNode, int depthLimit) {
         expandedStates++;
         maxDepthReached = Math.max(maxDepthReached, currentNode.getDepth());
 
-        // Sprawdzenie, czy osiągnięto limit głębokości.
         if (currentNode.getDepth() < depthLimit) {
             ArrayList<Node> neighbours = graph.generateNeighbours(currentNode);
             
@@ -113,6 +111,32 @@ ArrayList<Character> DFS(Graph graph, Node beginningNode, int depthLimit) {
                     }
                     closedStates.put(neighbourPuzzleState, neighbour.getDepth());
                     openStates.push(neighbour);
+                    generatedStates++;
+                }
+            }
+        }
+    }
+    return null;
+}
+
+ArrayList<Character> ASTAR(Graph graph, Node beginningNode) {
+    PriorityQueue<Node> openStates = new PriorityQueue<>();
+    HashSet<State> closedStates = new HashSet<>();
+
+    openStates.add(beginningNode);
+
+    while(!openStates.isEmpty()) {
+        Node currentNode = openStates.poll();
+        if(!closedStates.contains(currentNode.getPuzzleState())) {
+            expandedStates++;
+            maxDepthReached = Math.max(maxDepthReached, currentNode.getDepth());
+            if (graph.isGoalState(currentNode.getPuzzleState())) {
+                return graph.returnSolutionPath(currentNode);
+            }
+            closedStates.add(currentNode.getPuzzleState());
+            for (Node neighbour : graph.generateNeighbours(currentNode)) {
+                if (!closedStates.contains(neighbour.getPuzzleState())) {
+                    openStates.add(neighbour);
                     generatedStates++;
                 }
             }
@@ -177,11 +201,10 @@ public void writeResultsToFiles(int generatedStates, int expandedStates, ArrayLi
                 statsWriter.print(solutionLength);
                 break;
             case "dfs":
-                // Największa odwiedzona głębokość
                 statsWriter.print(maxDepthReached);
                 break;
             case "astr":
-                //TODO: add max recursive depth for ASTR
+                statsWriter.print(maxDepthReached);
                 break;
         }
         statsWriter.close();

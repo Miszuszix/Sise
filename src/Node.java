@@ -1,15 +1,25 @@
-public class Node {
-    
+public class Node implements Comparable<Node> {
+
     private final State puzzleState;
     private final Node parentNode;
     private final char operator;
-    private final int depth; // dla DFSa
+    private final int depth;
+    private int functionCost = 0;
 
-    public Node(State puzzleState, Node parentNode, char operator, int depth) {
+    public Node(State puzzleState, Node parentNode, char operator, int depth, State goalState, boolean isManhattan) {
         this.puzzleState = puzzleState;
         this.parentNode = parentNode;
         this.operator = operator;
         this.depth = depth;
+        this.functionCost = (isManhattan ? getPuzzleState().calculateManhattan(goalState) : getPuzzleState().calculateHamming(goalState)) + this.depth;
+    }
+
+    public Node(State puzzleState, State goalState, boolean isManhattan) {
+        this.puzzleState = puzzleState;
+        this.parentNode = null;
+        this.operator = ' ';
+        this.depth = 0;
+        this.functionCost = isManhattan ? getPuzzleState().calculateManhattan(goalState) : getPuzzleState().calculateHamming(goalState);
     }
 
     // Konstruktor dla stanu początkowego
@@ -18,6 +28,11 @@ public class Node {
         this.parentNode = null;
         this.operator = ' ';
         this.depth = 0;
+    }
+
+    @Override
+    public int compareTo(Node otherNode) {
+        return Integer.compare(this.functionCost, otherNode.functionCost);
     }
 
     public State getPuzzleState() {

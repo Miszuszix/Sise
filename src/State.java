@@ -82,6 +82,34 @@ public class State {
         return moves;
     }
 
+    public int calculateHamming(State goalState){
+        int hammingDistance = 0;
+        for(int row = 0 ; row < goalState.puzzleState.length; row++){
+            for(int column = 0 ; column < goalState.puzzleState[0].length; column++){
+                if(this.puzzleState[row][column] !=  0 && goalState.puzzleState[row][column] != puzzleState[row][column]){
+                    hammingDistance++;
+                }
+            }
+        }
+        return hammingDistance;
+    }
+
+    public int calculateManhattan(State goalState){
+        int manhattanDistance = 0;
+        int height = goalState.puzzleState.length;
+        int width = goalState.puzzleState[0].length;
+        for (int row = 0; row < height; row++){
+            for(int column = 0; column < width; column++){
+                if (this.puzzleState[row][column] == 0) continue;
+                int currentTile = this.puzzleState[row][column] - 1;
+                int targetRow = currentTile / width;
+                int targetColumn = currentTile % width;
+                manhattanDistance += Math.abs(targetRow - row) +  Math.abs(targetColumn - column);
+            }
+        }
+        return manhattanDistance;
+    }
+
     @Override
     public int hashCode() {
         int result = Arrays.deepHashCode(puzzleState);

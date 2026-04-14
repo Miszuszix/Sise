@@ -44,7 +44,8 @@ public class Graph {
                     }
             }
             State nextState = currentState.createNextState(move);
-            neighbours.add(new Node(nextState, currentNode, move, currentNode.getDepth() + 1));
+            boolean isManhattan = moveOrder.equalsIgnoreCase("manh");
+            neighbours.add(new Node(nextState, currentNode, move, currentNode.getDepth() + 1, goalState,  isManhattan));
         }
         return neighbours;
     }
