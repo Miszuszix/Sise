@@ -36,7 +36,7 @@ void main(String... args) {
     
     ArrayList<Character> solution = switch (strategy) {
         case "bfs" -> BFS(graph, new Node(initialState));
-        case "dfs" -> DFS(graph, new Node(initialState), 10);
+        case "dfs" -> DFS(graph, new Node(initialState), 7);
         case "astr" -> {
             boolean isManhattan = param.equalsIgnoreCase("manh");
             yield ASTAR(graph, new Node(initialState, goalState, isManhattan));
@@ -55,12 +55,13 @@ ArrayList<Character> BFS(Graph graph, Node beginningNode) {
         return graph.returnSolutionPath(beginningNode);
     }
 
-    Deque<Node> openStates = new LinkedList<>();
+    List<Node> openStates = new ArrayList<>();
     HashSet<State> closedStates = new HashSet<>();
 
     openStates.add(beginningNode);
+    closedStates.add(beginningNode.getPuzzleState());
     while (!openStates.isEmpty()) {
-        Node currentNode = openStates.remove();
+        Node currentNode = openStates.removeFirst();
         expandedStates++;
         
         for (Node neighbour : graph.generateNeighbours(currentNode)) {
@@ -71,8 +72,8 @@ ArrayList<Character> BFS(Graph graph, Node beginningNode) {
             }
             if (!closedStates.contains(neighbourPuzzleState)) {
                 openStates.add(neighbour);
-                closedStates.add(neighbourPuzzleState);
                 generatedStates++;
+                closedStates.add(neighbourPuzzleState);
             }
         }
     }
