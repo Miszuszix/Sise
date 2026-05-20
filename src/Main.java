@@ -36,7 +36,7 @@ void main(String... args) {
     
     ArrayList<Character> solution = switch (strategy) {
         case "bfs" -> BFS(graph, new Node(initialState));
-        case "dfs" -> DFS(graph, new Node(initialState), 7);
+        case "dfs" -> DFS(graph, new Node(initialState), 20);
         case "astr" -> {
             boolean isManhattan = param.equalsIgnoreCase("manh");
             yield ASTAR(graph, new Node(initialState, goalState, isManhattan));

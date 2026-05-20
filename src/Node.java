@@ -5,12 +5,14 @@ public class Node implements Comparable<Node> {
     private final char operator;
     private final int depth;
     private int functionCost = 0;
+    private boolean isManhattan;
 
     public Node(State puzzleState, Node parentNode, char operator, int depth, State goalState, boolean isManhattan) {
         this.puzzleState = puzzleState;
         this.parentNode = parentNode;
         this.operator = operator;
         this.depth = depth;
+        this.isManhattan = isManhattan;
         this.functionCost = (isManhattan ? getPuzzleState().calculateManhattan(goalState) : getPuzzleState().calculateHamming(goalState)) + this.depth;
     }
 
@@ -19,6 +21,7 @@ public class Node implements Comparable<Node> {
         this.parentNode = null;
         this.operator = ' ';
         this.depth = 0;
+        this.isManhattan = isManhattan;
         this.functionCost = isManhattan ? getPuzzleState().calculateManhattan(goalState) : getPuzzleState().calculateHamming(goalState);
     }
 
@@ -49,5 +52,9 @@ public class Node implements Comparable<Node> {
 
     public int getDepth() {
         return depth;
+    }
+
+    public boolean isManhattan() {
+        return isManhattan;
     }
 }

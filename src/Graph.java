@@ -20,6 +20,7 @@ public class Graph {
         ArrayList<Character> possibleMoves = currentState.generatePossibleMoves(moveOrder);
         
         char parentOperator = currentNode.getOperator();
+        boolean isManhattan = currentNode.isManhattan();
         
         for (char move : possibleMoves) {
             switch (move) {
@@ -44,7 +45,6 @@ public class Graph {
                     }
             }
             State nextState = currentState.createNextState(move);
-            boolean isManhattan = moveOrder.equalsIgnoreCase("manh");
             neighbours.add(new Node(nextState, currentNode, move, currentNode.getDepth() + 1, goalState,  isManhattan));
         }
         return neighbours;
